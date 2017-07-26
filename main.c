@@ -1,5 +1,9 @@
-#include <stdio.h>                                  // THORA COMPLICATED HAI, PAR CHALTA HAI..... CHILL HAI
+#include <stdio.h>                          
 #include <stdlib.h>
+
+// A Brute-force approach
+
+
 int which_sqr(int row,int column )          // INPUT IS THE LOCATION OF SUDOKU, IT TELLS IN WHICH 3x3 BOX DOES THE LOCATION LIES.
 {
     if ((row>=0)&&(row<=2))
@@ -366,10 +370,12 @@ int check_completion(int p[][9])
         {
             if (p[a][b]==0)
             {
+		
                 return 0;
             }
         }
     }
+	
     return 1;
 }
 int can_put(int p[][9],int i, int j)
@@ -385,7 +391,9 @@ int can_put(int p[][9],int i, int j)
         h=h+1;
    }
    if (t==1)
-   {return n;}
+   {
+    return n;
+   }
   if (t !=1)
    {
        return 0;}
@@ -410,20 +418,18 @@ void solve_sudoku1(int p[][9])
 }
 int main()
 {
-    printf("\t\t___________***********____________\n\nWECOME TO VINEET'S SUDOKU SOLVER.\n===>ENTER THE 9X9 SUDOKU.(Use '0' in the place of blank.)\n\n");
+    printf("Welcome tO Vineet's Sudoku solver.\n");
+    printf("INSTRUCTIONS:\n");
+    printf("1: Enter the 9X9 Sudoku puzzle.(Use '0' in the place of blank and give space between each entry)\n");
+    printf("2: The solver might take some time, please be patient after entering the puzzle.\n");
+    printf("3: Please check each row before hitting 'Enter'.\n");
+    printf("4: A typical row will look like: 0 9 0 0 0 0 0 0 5\n");
+    printf("_________________________________________________________________________________________\n\n\n\n");
     int p[9][9];
     int count=1;
 
     int i=0,j=0;
-  /* while(i<9)
-   {
-       while(j<9)
-       {
-            scanf("%d",&p[i][j]);
-            j=j+1;
-       }
-       i=i+1;
-   }*/
+
    for (i=0;i<=8;i=i+1)
     {
         for(j=0;j<=8;j=j+1)
@@ -431,6 +437,8 @@ int main()
             scanf("%d",&p[i][j]);
         }
     }
+
+    // This is for testing 
     /*p[0]=//('0','0','0','0','0','1','0','4','0');
     p[][1]={0,9,0,0,0,0,0,0,5};
     p[][2]={3,0,4,0,2,6,0,7,0};
@@ -442,6 +450,7 @@ int main()
     p[][8]={9,0,0,0,0,0,0,6,0};
     p[][9]={0,7,0,9,0,0,0,0,0};*/
 
+
     while (!check_completion(p)&&(count<1000))
     {
         solve_sudoku1(p);
@@ -450,7 +459,8 @@ int main()
     }
     if (count<999)
     {
-    printf("\n\nSOLVED SUDOKU PUZZLE..\n");
+     printf("\n\nThank you for using Vineet's Sudoku solver\n"); 
+    printf("Solved puzzle: \n");
     int a,b;
     for (a=0;a<9;a=a+1)
     {
@@ -460,10 +470,23 @@ int main()
         }
         printf("\n");
     }
+
+   
     }
     else{
-                printf("\n\nWRONG INPUT!!!!\nProcess terminated after 1000 iterations.\nPlease check your input and try again");
-          }
+        printf("\nSorry, the algorithm could not solve the input puzzle.\n");
+	printf("Either the input was wrong or the puzzle requires a trail and error step, which the algorithm is incapable of.\n");
+        printf("Partially Solved puzzle: \n");
+    int a,b;
+    for (a=0;a<9;a=a+1)
+    {
+        for(b=0;b<9;b=b+1)
+        {
+            printf("%d ",p[a][b]);
+        }
+        printf("\n");
+    } 
+	}
 
     return 1;
 }
