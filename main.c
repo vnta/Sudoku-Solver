@@ -1,7 +1,24 @@
 #include <stdio.h>                          
 #include <stdlib.h>
+#include <time.h>
 
 // A Brute-force approach
+
+void solve_sudoku2(int[][9] , int ); //Declaring
+void solve_sudoku1(int p[][9]);
+
+void copy_arr(int p[][9] , int p_dummy[][9] )
+{
+
+	for(int i=0; i<9; i=i+1)
+	{
+		for(int j=0; j<9; j=j+1)
+		{
+			p_dummy[i][j]=p[i][j];
+				}
+
+			}
+}
 
 
 int which_sqr(int row,int column )          // INPUT IS THE LOCATION OF SUDOKU, IT TELLS IN WHICH 3x3 BOX DOES THE LOCATION LIES.
@@ -145,9 +162,27 @@ int check_row(int p[][9],int i,int j,int value)                      /* CHECKS T
     return yes;
 }
 
-int if_apt(int p[][9],int i,int j,int value)
+int check_completion(int p[][9])
 {
-    int a,b,c;
+    int a,b;
+    for (a=0;a<9;a=a+1)
+    {
+        for(b=0;b<9;b=b+1)
+        {
+            if (p[a][b]==0)
+            {
+		
+                return 0;
+            }
+        }
+    }
+	
+    return 1;
+}
+
+int if_apt(int p[][9],int i,int j,int value)			            // Check if the current entry ie. value, is appropriate for 
+{									    // position i,j
+   int a,b,c;
    a= check_sqr(p,i,j,value);
    b=check_column(p,i,j,value);
    c=check_row(p,i,j,value);
@@ -157,13 +192,15 @@ int if_apt(int p[][9],int i,int j,int value)
    }
    else {return 0;}
 }
-int sd_put_column(int p[][9],int i,int j,int value)                         // DEKH LO YAAR....
+int sd_put_column(int p[][9],int i,int j,int value, int tae)             // Checks if a number ie. value can only be placed at one row(i) 
+									 //position for a particular column (j)
 {
-    int u,count=0,m=-1;
+    if (p[i][j]!=0){return 0;}
+    int u,count=0,m=-1,cunt=0;
     for (u=0;u<9;u=u+1)
     {
         if ((if_apt(p,u,j,value))&&p[u][j]==0)
-        {
+        {		
             count =count+1;
             m=u;
         }
@@ -172,11 +209,29 @@ int sd_put_column(int p[][9],int i,int j,int value)                         // D
     {
         return 1;
     }
-    else {return 0;}
+    if ((count>0)&&tae==1){
+	p[i][j] =value;
+	int p_dummy[9][9];
+	copy_arr(p,p_dummy);
+	while (!check_completion(p_dummy)&&(cunt<10))
+    	{
+        	solve_sudoku2(p_dummy,0);     //New and improved method
+        	cunt=cunt+1;
+    		}
+	if (check_completion(p_dummy))
+		{
+		copy_arr(p_dummy,p);
+		return 2;}
+	else {p[i][j] =0;
+	      return 0;		}
+	}
+    return 0;
 }
-int sd_put_row(int p[][9],int i,int j,int value)
+int sd_put_row(int p[][9],int i,int j,int value, int tae)    // Checks if a number ie. value can only be placed at one column(i) 
+									 //position for a particular column (j)
 {
-    int u,count=0,m=-1;
+    if (p[i][j]!=0){return 0;}
+    int u,count=0,m=-1,cunt=0;
     for (u=0;u<9;u=u+1)
     {
         if ((if_apt(p,i,u,value))&&p[i][u]==0)
@@ -189,12 +244,28 @@ int sd_put_row(int p[][9],int i,int j,int value)
     {
         return 1;
     }
-    else {return 0;}
+    if ((count>0)&&tae==1){
+	p[i][j] =value;
+	int p_dummy[9][9];
+	copy_arr(p,p_dummy);
+	while (!check_completion(p_dummy)&&(cunt<10))
+    	{      
+        	solve_sudoku2(p_dummy,0);     //New and improved method
+        	cunt=cunt+1;
+    		}
+	if (check_completion(p_dummy))
+		{
+		copy_arr(p_dummy,p);
+		return 2;}
+	else {p[i][j] =0;
+	      return 0;		}
+	}
+    return 0;
 }
 
-int sd_put_sqr(int p[][9], int n,int h, int a,int b)
+int sd_put_sqr(int p[][9], int n,int h, int a,int b, int tae)
 {
-    int y,z,k,l,count=0,v=-1,c=-1;
+    int y,z,k,l,count=0,v=-1,c=-1,cunt=0;
         if (n==1)
     {
         k=0;
@@ -241,6 +312,8 @@ int sd_put_sqr(int p[][9], int n,int h, int a,int b)
         l=6;
     }
 
+    if (p[k+a][l+b]!=0){return 0;}
+
       for(y=0;y<3;y=y+1)
     {
         for (z=0;z<3;z=z+1)
@@ -257,37 +330,63 @@ int sd_put_sqr(int p[][9], int n,int h, int a,int b)
    {
        return 1;
    }
-   else{return 0;}
+
+   if ((count>0)&&tae==1){
+	p[k+a][l+b] =h;
+	int p_dummy[9][9];
+	copy_arr(p,p_dummy);
+	while (!check_completion(p_dummy)&&(cunt<10))
+    	{
+        	solve_sudoku2(p_dummy,0);     //New and improved method
+        	cunt=cunt+1;
+    		}
+	if (check_completion(p_dummy))
+		{
+		    copy_arr(p_dummy,p);
+		    return 2;}
+	else {p[k+a][l+b] =0;
+	      return 0;		}
+	}
+    return 0;
 }
-void do_column(int p[][9], int j)
+void do_column(int p[][9], int j, int tae)
 {
     int h=1,u;
     while (h<10)
     {
         for (u=0;u<9;u=u+1)
         {
-            if (sd_put_column(p,u,j,h))
+	    int temp_col=sd_put_column(p,u,j,h,tae);
+            if (temp_col==1)
            {
                p[u][j] =h;
+           }
+ 	   if (temp_col==2)
+           {
+               break; 
            }
         }
         h=h+1;
     }
 }
-void do_row(int p[][9],int i)
+void do_row(int p[][9],int i, int tae)
 {
     int h=1,u;
     while (h<10)
     {
         for (u=0;u<9;u=u+1)
-        {
-            if (sd_put_row(p,i,u,h))
-           {p[i][u] =h;}
+        {    int temp_row=sd_put_row(p,i,u,h,tae);
+            if (temp_row==1)
+              {p[i][u] =h;}
+
+	    if (temp_row==2)
+              {break;}
         }
-        h=h+1;
+
+      h=h+1;
     }
 }
-void do_square(int p[][9],int n)
+void do_square(int p[][9],int n,int tae)
 {
     int k,l,h=1,y,z;
     if (n==1)
@@ -340,44 +439,36 @@ void do_square(int p[][9],int n)
       for(y=0;y<3;y=y+1)
     {
         for (z=0;z<3;z=z+1)
-        {
-            if (sd_put_sqr(p,n,h,y,z))
+        {   
+            int temp_sqr=sd_put_sqr(p,n,h,y,z,tae); 
+            if (temp_sqr==1)
             {
                 p[k+y][l+z]=h;
+            }
+	   if (temp_sqr==2)
+            {
+                break;
             }
         }
     }
     h=h+1;
 }
 }
-void solve_sudoku2(int p[][9])
+void solve_sudoku2(int p[][9], int tae)       
 {
     int i;
     for(i=0;i<9;i=i+1)
     {
-        do_square(p,i+1);
-        do_row(p,i);
-        do_column(p,i);
+	if (!check_completion(p)){
+	solve_sudoku1(p);    //Old method
+        do_square(p,i+1,tae);
+        do_row(p,i,tae);
+        do_column(p,i,tae);
+	}
     }
 }
 
-int check_completion(int p[][9])
-{
-    int a,b;
-    for (a=0;a<9;a=a+1)
-    {
-        for(b=0;b<9;b=b+1)
-        {
-            if (p[a][b]==0)
-            {
-		
-                return 0;
-            }
-        }
-    }
-	
-    return 1;
-}
+
 int can_put(int p[][9],int i, int j)
 {
      int h=1,t=0,n;
@@ -418,7 +509,7 @@ void solve_sudoku1(int p[][9])
 }
 int main()
 {
-    printf("Welcome tO Vineet's Sudoku solver.\n");
+    printf("Welcome to Vineet's Sudoku solver.\n");
     printf("INSTRUCTIONS:\n");
     printf("1: Enter the 9X9 Sudoku puzzle.(Use '0' in the place of blank and give space between each entry)\n");
     printf("2: The solver might take some time, please be patient after entering the puzzle.\n");
@@ -427,6 +518,7 @@ int main()
     printf("_________________________________________________________________________________________\n\n\n\n");
     int p[9][9];
     int count=1;
+    int iter=3;
 
     int i=0,j=0;
 
@@ -438,44 +530,37 @@ int main()
         }
     }
 
-    // This is for testing 
-    /*p[0]=//('0','0','0','0','0','1','0','4','0');
-    p[][1]={0,9,0,0,0,0,0,0,5};
-    p[][2]={3,0,4,0,2,6,0,7,0};
-    p[][3]={8,0,0,0,0,0,1,0,9};
-    p[][4]={0,0,0,0,4,0,0,0,0};
-    p[][5]={6,0,2,0,0,0,0,0,3};
-    p[][6]={0,1,0,7,5,0,2,0,8};
-    p[][7]={0,1,0,7,5,0,2,0,8};
-    p[][8]={9,0,0,0,0,0,0,6,0};
-    p[][9]={0,7,0,9,0,0,0,0,0};*/
+    clock_t start,end;
+    double time_used;
+    start=clock();
 
-
-    while (!check_completion(p)&&(count<1000))
+    while (!check_completion(p)&&(count<iter))
     {
-        solve_sudoku1(p);
-        solve_sudoku2(p);
+        solve_sudoku2(p,1);     //New and improved method
         count=count+1;
     }
-    if (count<999)
-    {
-     printf("\n\nThank you for using Vineet's Sudoku solver\n"); 
-    printf("Solved puzzle: \n");
-    int a,b;
-    for (a=0;a<9;a=a+1)
-    {
-        for(b=0;b<9;b=b+1)
-        {
-            printf("%d ",p[a][b]);
-        }
-        printf("\n");
-    }
 
-   
+    if (check_completion(p))
+    {
+     end=clock();
+     time_used=((double)(end-start))/CLOCKS_PER_SEC;
+     printf("\nTime required to solve the puzzle: %f seconds\n", time_used);
+     printf("Solved puzzle: \n");
+     
+     for (int a=0;a<9;a=a+1)
+     {
+         for(int b=0;b<9;b=b+1)
+         {
+             printf("%d ",p[a][b]);
+         }
+         printf("\n");
+     }
+      printf("\nThank you for using Vineet's Sudoku solver!!\n\n");
+    
     }
     else{
-        printf("\nSorry, the algorithm could not solve the input puzzle.\n");
-	printf("Either the input was wrong or the puzzle requires a trail and error step, which the algorithm is incapable of.\n");
+	printf("Wrong input!! Please check your input and try again\n");
+        printf("If you think your input is correct and the algorithm is incapable of solving the puzzle,\nplease e-mail at: anand.vineet19@gmail.com\n");
         printf("Partially Solved puzzle: \n");
     int a,b;
     for (a=0;a<9;a=a+1)
